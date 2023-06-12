@@ -1,0 +1,107 @@
+#/usr/bin/env python
+#
+
+import sys, os, time, fileinput
+import numpy as np
+import glob
+
+#username
+username="ramirez"
+
+#make folder for python scripts
+executedir = "wt_batch_exec"
+os.system("rm -rf "+executedir)
+os.system("mkdir "+executedir)
+
+# data file for iteration
+arr_a_deg = np.array([0.6])
+# step_size = 0.005
+# arr_by_plot = np.arange(0,1+step_size,step_size, dtype = float)
+# arr_by = 0.5 * (arr_by_plot[:-1] + arr_by_plot[1:])
+
+import healpy as hp
+NSIDE = 4
+NPIX = hp.nside2npix(NSIDE)
+arr_npix = np.arange(NPIX)
+
+# define mesh grid
+mesh_npix, mesh_a = np.meshgrid(arr_npix,arr_a_deg) # each output array (NxN shaped) contains x or y value at given (i,j)-th position
+mesh = np.stack((mesh_npix, mesh_a), axis=-1)
+
+NPIX = len(arr_npix)
+Na = len(arr_a_deg)
+arr_inputs = mesh.reshape(Na*NPIX,2) # flatten to 2D array
+
+np.savetxt('inputs_list', arr_inputs, fmt = '%.5f', delimiter = ', ') # fmt specifies integer format
+os.system("mv inputs_list " + executedir) # send to batch file for loading
+
+# other inputs
+wavelet_name = 'mexh'
+grid_scale_deg = 0.4 
+str_grid_scale_deg = str.format('{0:.4f}',grid_scale_deg)
+
+#open file to contain submission commands for jdl files
+dofile = open(executedir+"/do_all.src",'w')
+
+basename = 'patch_'
+
+# # identify directory containing results produced by main script
+# RESULTS_DIR = "/het/p4/"+username+"/gcewavelets/skysearch/results/preprocessed"
+
+# # make directory if it doesn't already exist
+# os.system("mkdir -p "+RESULTS_DIR)
+    
+# make condor directory
+condor_dir = '/het/p4/'+username+'/gcewavelets/skysearch/condor'
+os.system("mkdir -p "+condor_dir)
+
+#define the local scratch folder
+localdir = "$_CONDOR_SCRATCH_DIR"
+gen_command = ( 'python '+'/het/p4/'+username+
+               '/gcewavelets/skysearch/code/generate_wavelet_coefficients.py')
+
+runname = basename
+
+# key difference: iterate over exec.sh file, not the python file itself!
+execfilename = "exec"+".sh"
+executefile = open(executedir+"/"+execfilename,'w')
+executefile.write("#!/bin/bash\n")
+executefile.write("export VO_CMS_SW_DIR=\"/cms/base/cmssoft\"\n")
+executefile.write("export COIN_FULL_INDIRECT_RENDERING=1\n")
+executefile.write("export SCRAM_ARCH=\"slc5_amd64_gcc434\"\n")
+executefile.write("source $VO_CMS_SW_DIR/cmsset_default.sh\n")
+
+#copy template directory to new location, and update its random number seed and run name
+executefile.write("cd "+localdir+"\n")
+#    executefile.write("mkdir -p results\n")
+executefile.write("npix=$1\n")
+executefile.write("a=$2\n")
+executefile.write(gen_command+' '+'$npix'+' '+'$a'+' '+wavelet_name+' '+str_grid_scale_deg+'\n')
+#    executefile.write('tar -czvf '+runname+'.tar.gz results/*\n')
+#    executefile.write('cp *tar.gz '+RESULTS_DIR+'\n')
+# executefile.write('cp -r * '+RESULTS_DIR+'\n')
+executefile.close()
+os.system("chmod u+x "+executedir+"/"+execfilename)
+
+#write out jdl script for job submission
+jdlfilename = "exec"+".jdl.base"
+jdlfile = open(executedir+"/"+jdlfilename,'w')
+jdlfile.write("universe = vanilla\n")
+jdlfile.write("+AccountingGroup = \"group_rutgers."+username+"\"\n")
+jdlfile.write("Arguments = $(npix) $(a)\n")
+jdlfile.write("Executable = /het/p4/"+username+"/gcewavelets/skysearch/code/"+executedir+"/"+execfilename+"\n")
+jdlfile.write("getenv = True\n")
+jdlfile.write("should_transfer_files = NO\n")
+jdlfile.write("priority = 0\n")
+jdlfile.write("Output = /het/p4/"+username+"/gcewavelets/skysearch/condor/"+runname+'$(npix)'+'_'+'$(a)'+".out\n")
+jdlfile.write("Error = /het/p4/"+username+"/gcewavelets/skysearch/condor/"+runname+'$(npix)'+'_'+'$(a)'+".err\n")
+jdlfile.write("Log = /het/p4/"+username+"/gcewavelets/skysearch/condor/script.condor\n")
+jdlfile.write("max_materialize = 200\n") # needs to be placed before queue
+jdlfile.write("queue npix,a from inputs_list\n") # data file should not have format
+jdlfile.close()
+
+dofile.write("condor_submit "+jdlfilename+"\n")
+
+print('Done!')
+
+dofile.close()

@@ -1,0 +1,394 @@
+(base) -bash-4.2$ conda create --prefix=fermipy -c conda-forge -c fermi python=3.9 "fermitools>=2.2.0" healpy gammapy
+Collecting package metadata (current_repodata.json): done
+Solving environment: failed with repodata from current_repodata.json, will retry with next repodata source.
+Collecting package metadata (repodata.json): done
+Solving environment: done
+
+
+==> WARNING: A newer version of conda exists. <==
+  current version: 4.13.0
+  latest version: 23.3.1
+
+Please update conda by running
+
+    $ conda update -n base conda
+
+
+
+## Package Plan ##
+
+  environment location: /het/p4/ramirez/envs/fermipy
+
+  added / updated specs:
+    - fermitools[version='>=2.2.0']
+    - gammapy
+    - healpy
+    - python=3.9
+
+
+The following NEW packages will be INSTALLED:
+
+  _libgcc_mutex      conda-forge/linux-64::_libgcc_mutex-0.1-conda_forge
+  _openmp_mutex      conda-forge/linux-64::_openmp_mutex-4.5-2_gnu
+  alsa-lib           conda-forge/linux-64::alsa-lib-1.2.8-h166bdaf_0
+  astropy            conda-forge/linux-64::astropy-5.2.2-py39hf0d0a58_0
+  attr               conda-forge/linux-64::attr-2.5.1-h166bdaf_1
+  brotli             conda-forge/linux-64::brotli-1.0.9-h166bdaf_8
+  brotli-bin         conda-forge/linux-64::brotli-bin-1.0.9-h166bdaf_8
+  brotlipy           conda-forge/linux-64::brotlipy-0.7.0-py39hb9d737c_1005
+  bzip2              conda-forge/linux-64::bzip2-1.0.8-h7f98852_4
+  c-ares             conda-forge/linux-64::c-ares-1.18.1-h7f98852_0
+  ca-certificates    conda-forge/linux-64::ca-certificates-2022.12.7-ha878542_0
+  cairo              conda-forge/linux-64::cairo-1.16.0-h35add3b_1015
+  certifi            conda-forge/noarch::certifi-2022.12.7-pyhd8ed1ab_0
+  cffi               conda-forge/linux-64::cffi-1.15.1-py39he91dace_3
+  cfitsio            conda-forge/linux-64::cfitsio-4.1.0-hd9d235c_0
+  charset-normalizer conda-forge/noarch::charset-normalizer-3.1.0-pyhd8ed1ab_0
+  clhep              conda-forge/linux-64::clhep-2.4.5.3-h27087fc_0
+  click              conda-forge/noarch::click-8.1.3-unix_pyhd8ed1ab_2
+  colorama           conda-forge/noarch::colorama-0.4.6-pyhd8ed1ab_0
+  contourpy          conda-forge/linux-64::contourpy-1.0.7-py39h4b4f3f3_0
+  cppunit            conda-forge/linux-64::cppunit-1.15.1-h9c3ff4c_0
+  cryptography       conda-forge/linux-64::cryptography-40.0.2-py39h079d5ae_0
+  cycler             conda-forge/noarch::cycler-0.11.0-pyhd8ed1ab_0
+  dbus               conda-forge/linux-64::dbus-1.13.6-h5008d03_3
+  exceptiongroup     conda-forge/noarch::exceptiongroup-1.1.1-pyhd8ed1ab_0
+  expat              conda-forge/linux-64::expat-2.5.0-hcb278e6_1
+  f2c                conda-forge/linux-64::f2c-20210323183018-h166bdaf_1010
+  fermitools         fermi/linux-64::fermitools-2.2.0-py39h93a0a19_0
+  fermitools-data    fermi/noarch::fermitools-data-0.18-0
+  fftw               conda-forge/linux-64::fftw-3.3.10-nompi_hc118613_107
+  font-ttf-dejavu-s~ conda-forge/noarch::font-ttf-dejavu-sans-mono-2.37-hab24e00_0
+  font-ttf-inconsol~ conda-forge/noarch::font-ttf-inconsolata-3.000-h77eed37_0
+  font-ttf-source-c~ conda-forge/noarch::font-ttf-source-code-pro-2.038-h77eed37_0
+  font-ttf-ubuntu    conda-forge/noarch::font-ttf-ubuntu-0.83-hab24e00_0
+  fontconfig         conda-forge/linux-64::fontconfig-2.14.2-h14ed4e7_0
+  fonts-conda-ecosy~ conda-forge/noarch::fonts-conda-ecosystem-1-0
+  fonts-conda-forge  conda-forge/noarch::fonts-conda-forge-1-0
+  fonttools          conda-forge/linux-64::fonttools-4.39.3-py39h72bdee0_0
+  freetype           conda-forge/linux-64::freetype-2.12.1-hca18f0e_1
+  gammapy            conda-forge/linux-64::gammapy-1.0.1-py39h389d5f1_0
+  gettext            conda-forge/linux-64::gettext-0.21.1-h27087fc_0
+  glib               conda-forge/linux-64::glib-2.76.1-h3eb15da_0
+  glib-tools         conda-forge/linux-64::glib-tools-2.76.1-h3eb15da_0
+  graphite2          conda-forge/linux-64::graphite2-1.3.13-h58526e2_1001
+  gsl                conda-forge/linux-64::gsl-2.7-he838d99_0
+  gst-plugins-base   conda-forge/linux-64::gst-plugins-base-1.22.0-h4243ec0_2
+  gstreamer          conda-forge/linux-64::gstreamer-1.22.0-h25f0c4b_2
+  harfbuzz           conda-forge/linux-64::harfbuzz-6.0.0-h3ff4399_1
+  healpix_cxx        conda-forge/linux-64::healpix_cxx-3.31-h268b298_1007
+  healpy             conda-forge/linux-64::healpy-1.16.1-py39hbafa5a2_2
+  icu                conda-forge/linux-64::icu-72.1-hcb278e6_0
+  idna               conda-forge/noarch::idna-3.4-pyhd8ed1ab_0
+  iminuit            conda-forge/linux-64::iminuit-2.21.3-py39h227be39_0
+  importlib-metadata conda-forge/noarch::importlib-metadata-6.5.0-pyha770c72_0
+  importlib-resourc~ conda-forge/noarch::importlib-resources-5.12.0-pyhd8ed1ab_0  importlib_resourc~ conda-forge/noarch::importlib_resources-5.12.0-pyhd8ed1ab_0  iniconfig          conda-forge/noarch::iniconfig-2.0.0-pyhd8ed1ab_0
+  keyutils           conda-forge/linux-64::keyutils-1.6.1-h166bdaf_0
+  kiwisolver         conda-forge/linux-64::kiwisolver-1.4.4-py39hf939315_1
+  krb5               conda-forge/linux-64::krb5-1.20.1-h81ceb04_0
+  lame               conda-forge/linux-64::lame-3.100-h166bdaf_1003
+  lcms2              conda-forge/linux-64::lcms2-2.15-haa2dc70_1
+  ld_impl_linux-64   conda-forge/linux-64::ld_impl_linux-64-2.40-h41732ed_0
+  lerc               conda-forge/linux-64::lerc-4.0.0-h27087fc_0
+  libblas            conda-forge/linux-64::libblas-3.9.0-16_linux64_openblas
+  libbrotlicommon    conda-forge/linux-64::libbrotlicommon-1.0.9-h166bdaf_8
+  libbrotlidec       conda-forge/linux-64::libbrotlidec-1.0.9-h166bdaf_8
+  libbrotlienc       conda-forge/linux-64::libbrotlienc-1.0.9-h166bdaf_8
+  libcap             conda-forge/linux-64::libcap-2.67-he9d0100_0
+  libcblas           conda-forge/linux-64::libcblas-3.9.0-16_linux64_openblas
+  libclang           conda-forge/linux-64::libclang-16.0.1-default_h62803fd_0
+  libclang13         conda-forge/linux-64::libclang13-16.0.1-default_h9b593c0_0
+  libcups            conda-forge/linux-64::libcups-2.3.3-h36d4200_3
+  libcurl            conda-forge/linux-64::libcurl-8.0.1-h588be90_0
+  libdeflate         conda-forge/linux-64::libdeflate-1.18-h0b41bf4_0
+  libedit            conda-forge/linux-64::libedit-3.1.20191231-he28a2e2_2
+  libev              conda-forge/linux-64::libev-4.33-h516909a_1
+  libevent           conda-forge/linux-64::libevent-2.1.10-h28343ad_4
+  libexpat           conda-forge/linux-64::libexpat-2.5.0-hcb278e6_1
+  libffi             conda-forge/linux-64::libffi-3.4.2-h7f98852_5
+  libflac            conda-forge/linux-64::libflac-1.4.2-h27087fc_0
+  libgcc-ng          conda-forge/linux-64::libgcc-ng-12.2.0-h65d4601_19
+  libgcrypt          conda-forge/linux-64::libgcrypt-1.10.1-h166bdaf_0
+  libgfortran-ng     conda-forge/linux-64::libgfortran-ng-12.2.0-h69a702a_19
+  libgfortran5       conda-forge/linux-64::libgfortran5-12.2.0-h337968e_19
+  libglib            conda-forge/linux-64::libglib-2.76.1-ha491796_0
+  libgomp            conda-forge/linux-64::libgomp-12.2.0-h65d4601_19
+  libgpg-error       conda-forge/linux-64::libgpg-error-1.46-h620e276_0
+  libiconv           conda-forge/linux-64::libiconv-1.17-h166bdaf_0
+  libjpeg-turbo      conda-forge/linux-64::libjpeg-turbo-2.1.5.1-h0b41bf4_0
+  liblapack          conda-forge/linux-64::liblapack-3.9.0-16_linux64_openblas
+  libllvm16          conda-forge/linux-64::libllvm16-16.0.1-hadd5161_0
+  libnghttp2         conda-forge/linux-64::libnghttp2-1.52.0-h61bc06f_0
+  libnsl             conda-forge/linux-64::libnsl-2.0.0-h7f98852_0
+  libogg             conda-forge/linux-64::libogg-1.3.4-h7f98852_1
+  libopenblas        conda-forge/linux-64::libopenblas-0.3.21-pthreads_h78a6416_3
+  libopus            conda-forge/linux-64::libopus-1.3.1-h7f98852_1
+  libpng             conda-forge/linux-64::libpng-1.6.39-h753d276_0
+  libpq              conda-forge/linux-64::libpq-15.2-hb675445_0
+  libsndfile         conda-forge/linux-64::libsndfile-1.2.0-hb75c966_0
+  libsqlite          conda-forge/linux-64::libsqlite-3.40.0-h753d276_0
+  libssh2            conda-forge/linux-64::libssh2-1.10.0-hf14f497_3
+  libstdcxx-ng       conda-forge/linux-64::libstdcxx-ng-12.2.0-h46fd767_19
+  libsystemd0        conda-forge/linux-64::libsystemd0-253-h8c4010b_1
+  libtiff            conda-forge/linux-64::libtiff-4.5.0-ha587672_6
+  libuuid            conda-forge/linux-64::libuuid-2.38.1-h0b41bf4_0
+  libvorbis          conda-forge/linux-64::libvorbis-1.3.7-h9c3ff4c_0
+  libwebp-base       conda-forge/linux-64::libwebp-base-1.3.0-h0b41bf4_0
+  libxcb             conda-forge/linux-64::libxcb-1.13-h7f98852_1004
+  libxkbcommon       conda-forge/linux-64::libxkbcommon-1.5.0-h79f4944_1
+  libxml2            conda-forge/linux-64::libxml2-2.10.4-hfdac1af_0
+  libzlib            conda-forge/linux-64::libzlib-1.2.13-h166bdaf_4
+  lz4-c              conda-forge/linux-64::lz4-c-1.9.4-hcb278e6_0
+  matplotlib         conda-forge/linux-64::matplotlib-3.7.1-py39hf3d152e_0
+  matplotlib-base    conda-forge/linux-64::matplotlib-base-3.7.1-py39he190548_0
+  mpg123             conda-forge/linux-64::mpg123-1.31.3-hcb278e6_0
+  munkres            conda-forge/noarch::munkres-1.1.4-pyh9f0ad1d_0
+  mysql-common       conda-forge/linux-64::mysql-common-8.0.32-ha901b37_1
+  mysql-libs         conda-forge/linux-64::mysql-libs-8.0.32-hd7da12d_1
+  ncurses            conda-forge/linux-64::ncurses-6.3-h27087fc_1
+  nspr               conda-forge/linux-64::nspr-4.35-h27087fc_0
+  nss                conda-forge/linux-64::nss-3.89-he45b914_0
+  numpy              conda-forge/linux-64::numpy-1.24.2-py39h7360e5f_0
+  openjpeg           conda-forge/linux-64::openjpeg-2.5.0-hfec8fc6_2
+  openssl            conda-forge/linux-64::openssl-3.1.0-h0b41bf4_0
+  packaging          conda-forge/noarch::packaging-23.1-pyhd8ed1ab_0
+  pcre2              conda-forge/linux-64::pcre2-10.40-hc3806b6_0
+  pgplot             conda-forge/linux-64::pgplot-5.2.2-h68245ad_1008
+  pillow             conda-forge/linux-64::pillow-9.5.0-py39h7207d5c_0
+  pip                conda-forge/noarch::pip-23.1-pyhd8ed1ab_0
+  pixman             conda-forge/linux-64::pixman-0.40.0-h36c2ea0_0
+  platformdirs       conda-forge/noarch::platformdirs-3.2.0-pyhd8ed1ab_0
+  pluggy             conda-forge/noarch::pluggy-1.0.0-pyhd8ed1ab_5
+  ply                conda-forge/noarch::ply-3.11-py_1
+  pmw                conda-forge/linux-64::pmw-2.0.1-py39hf3d152e_1007
+  pooch              conda-forge/noarch::pooch-1.7.0-pyha770c72_3
+  pthread-stubs      conda-forge/linux-64::pthread-stubs-0.4-h36c2ea0_1001
+  pulseaudio-client  conda-forge/linux-64::pulseaudio-client-16.1-h5195f5e_3
+  pycparser          conda-forge/noarch::pycparser-2.21-pyhd8ed1ab_0
+  pydantic           conda-forge/linux-64::pydantic-1.10.7-py39h72bdee0_0
+  pyerfa             conda-forge/linux-64::pyerfa-2.0.0.3-py39h389d5f1_0
+  pyopenssl          conda-forge/noarch::pyopenssl-23.1.1-pyhd8ed1ab_0
+  pyparsing          conda-forge/noarch::pyparsing-3.0.9-pyhd8ed1ab_0
+  pyqt               conda-forge/linux-64::pyqt-5.15.7-py39h5c7b992_3
+  pyqt5-sip          conda-forge/linux-64::pyqt5-sip-12.11.0-py39h227be39_3
+  pysocks            conda-forge/noarch::pysocks-1.7.1-pyha2e5f31_6
+  pytest             conda-forge/noarch::pytest-7.3.1-pyhd8ed1ab_0
+  pytest-runner      conda-forge/noarch::pytest-runner-6.0.0-pyhd8ed1ab_0
+  python             conda-forge/linux-64::python-3.9.16-h2782a2a_0_cpython
+  python-dateutil    conda-forge/noarch::python-dateutil-2.8.2-pyhd8ed1ab_0
+  python_abi         conda-forge/linux-64::python_abi-3.9-3_cp39
+  pyyaml             conda-forge/linux-64::pyyaml-6.0-py39hb9d737c_5
+  qt-main            conda-forge/linux-64::qt-main-5.15.8-h5c52f38_9
+  readline           conda-forge/linux-64::readline-8.2-h8228510_1
+  regions            conda-forge/linux-64::regions-0.7-py39h2ae25f5_2
+  requests           conda-forge/noarch::requests-2.28.2-pyhd8ed1ab_1
+  scipy              conda-forge/linux-64::scipy-1.10.1-py39he83f1e1_0
+  setuptools         conda-forge/noarch::setuptools-67.6.1-pyhd8ed1ab_0
+  sip                conda-forge/linux-64::sip-6.7.8-py39h227be39_0
+  six                conda-forge/noarch::six-1.16.0-pyh6c4a22f_0
+  tk                 conda-forge/linux-64::tk-8.6.12-h27826a3_0
+  toml               conda-forge/noarch::toml-0.10.2-pyhd8ed1ab_0
+  tomli              conda-forge/noarch::tomli-2.0.1-pyhd8ed1ab_0
+  tornado            conda-forge/linux-64::tornado-6.3-py39h72bdee0_0
+  typing-extensions  conda-forge/noarch::typing-extensions-4.5.0-hd8ed1ab_0
+  typing_extensions  conda-forge/noarch::typing_extensions-4.5.0-pyha770c72_0
+  tzdata             conda-forge/noarch::tzdata-2023c-h71feb2d_0
+  unicodedata2       conda-forge/linux-64::unicodedata2-15.0.0-py39hb9d737c_0
+  urllib3            conda-forge/noarch::urllib3-1.26.15-pyhd8ed1ab_0
+  wcslib             conda-forge/linux-64::wcslib-7.12-h6195f97_0
+  wheel              conda-forge/noarch::wheel-0.40.0-pyhd8ed1ab_0
+  xcb-util           conda-forge/linux-64::xcb-util-0.4.0-h166bdaf_0
+  xcb-util-image     conda-forge/linux-64::xcb-util-image-0.4.0-h166bdaf_0
+  xcb-util-keysyms   conda-forge/linux-64::xcb-util-keysyms-0.4.0-h166bdaf_0
+  xcb-util-renderut~ conda-forge/linux-64::xcb-util-renderutil-0.3.9-h166bdaf_0
+  xcb-util-wm        conda-forge/linux-64::xcb-util-wm-0.4.1-h166bdaf_0
+  xerces-c           conda-forge/linux-64::xerces-c-3.2.4-h8d71039_2
+  xkeyboard-config   conda-forge/linux-64::xkeyboard-config-2.38-h0b41bf4_0
+  xorg-kbproto       conda-forge/linux-64::xorg-kbproto-1.0.7-h7f98852_1002
+  xorg-libice        conda-forge/linux-64::xorg-libice-1.0.10-h7f98852_0
+  xorg-libsm         conda-forge/linux-64::xorg-libsm-1.2.3-hd9c2040_1000
+  xorg-libx11        conda-forge/linux-64::xorg-libx11-1.8.4-h0b41bf4_0
+  xorg-libxau        conda-forge/linux-64::xorg-libxau-1.0.9-h7f98852_0
+  xorg-libxdmcp      conda-forge/linux-64::xorg-libxdmcp-1.1.3-h7f98852_0
+  xorg-libxext       conda-forge/linux-64::xorg-libxext-1.3.4-h0b41bf4_2
+  xorg-libxrender    conda-forge/linux-64::xorg-libxrender-0.9.10-h7f98852_1003
+  xorg-renderproto   conda-forge/linux-64::xorg-renderproto-0.11.1-h7f98852_1002  xorg-xextproto     conda-forge/linux-64::xorg-xextproto-7.3.0-h0b41bf4_1003
+  xorg-xf86vidmodep~ conda-forge/linux-64::xorg-xf86vidmodeproto-2.3.1-h7f98852_1002
+  xorg-xproto        conda-forge/linux-64::xorg-xproto-7.0.31-h7f98852_1007
+  xz                 conda-forge/linux-64::xz-5.2.6-h166bdaf_0
+  yaml               conda-forge/linux-64::yaml-0.2.5-h7f98852_2
+  zipp               conda-forge/noarch::zipp-3.15.0-pyhd8ed1ab_0
+  zlib               conda-forge/linux-64::zlib-1.2.13-h166bdaf_4
+  zstd               conda-forge/linux-64::zstd-1.5.2-h3eb15da_6
+
+
+Proceed ([y]/n)? y
+
+Preparing transaction: done
+Verifying transaction: failed
+
+CondaVerificationError: The package for wcslib located at /home/ramirez/.conda/pkgs/wcslib-7.12-h6195f97_0
+appears to be corrupted. The path 'include/wcslib/cel.h'
+specified in the package manifest cannot be found.
+
+CondaVerificationError: The package for wcslib located at /home/ramirez/.conda/pkgs/wcslib-7.12-h6195f97_0
+appears to be corrupted. The path 'include/wcslib/cpgsbox.h'
+specified in the package manifest cannot be found.
+
+CondaVerificationError: The package for wcslib located at /home/ramirez/.conda/pkgs/wcslib-7.12-h6195f97_0
+appears to be corrupted. The path 'include/wcslib/dis.h'
+specified in the package manifest cannot be found.
+
+CondaVerificationError: The package for wcslib located at /home/ramirez/.conda/pkgs/wcslib-7.12-h6195f97_0
+appears to be corrupted. The path 'include/wcslib/fitshdr.h'
+specified in the package manifest cannot be found.
+
+CondaVerificationError: The package for wcslib located at /home/ramirez/.conda/pkgs/wcslib-7.12-h6195f97_0
+appears to be corrupted. The path 'include/wcslib/getwcstab.h'
+specified in the package manifest cannot be found.
+
+CondaVerificationError: The package for wcslib located at /home/ramirez/.conda/pkgs/wcslib-7.12-h6195f97_0
+appears to be corrupted. The path 'include/wcslib/lin.h'
+specified in the package manifest cannot be found.
+
+CondaVerificationError: The package for wcslib located at /home/ramirez/.conda/pkgs/wcslib-7.12-h6195f97_0
+appears to be corrupted. The path 'include/wcslib/log.h'
+specified in the package manifest cannot be found.
+
+CondaVerificationError: The package for wcslib located at /home/ramirez/.conda/pkgs/wcslib-7.12-h6195f97_0
+appears to be corrupted. The path 'include/wcslib/pgwcsl.h'
+specified in the package manifest cannot be found.
+
+CondaVerificationError: The package for wcslib located at /home/ramirez/.conda/pkgs/wcslib-7.12-h6195f97_0
+appears to be corrupted. The path 'include/wcslib/prj.h'
+specified in the package manifest cannot be found.
+
+CondaVerificationError: The package for wcslib located at /home/ramirez/.conda/pkgs/wcslib-7.12-h6195f97_0
+appears to be corrupted. The path 'include/wcslib/spc.h'
+specified in the package manifest cannot be found.
+
+CondaVerificationError: The package for wcslib located at /home/ramirez/.conda/pkgs/wcslib-7.12-h6195f97_0
+appears to be corrupted. The path 'include/wcslib/sph.h'
+specified in the package manifest cannot be found.
+
+CondaVerificationError: The package for wcslib located at /home/ramirez/.conda/pkgs/wcslib-7.12-h6195f97_0
+appears to be corrupted. The path 'include/wcslib/spx.h'
+specified in the package manifest cannot be found.
+
+CondaVerificationError: The package for wcslib located at /home/ramirez/.conda/pkgs/wcslib-7.12-h6195f97_0
+appears to be corrupted. The path 'include/wcslib/tab.h'
+specified in the package manifest cannot be found.
+
+CondaVerificationError: The package for wcslib located at /home/ramirez/.conda/pkgs/wcslib-7.12-h6195f97_0
+appears to be corrupted. The path 'include/wcslib/wcs.h'
+specified in the package manifest cannot be found.
+
+CondaVerificationError: The package for wcslib located at /home/ramirez/.conda/pkgs/wcslib-7.12-h6195f97_0
+appears to be corrupted. The path 'include/wcslib/wcsconfig.h'
+specified in the package manifest cannot be found.
+
+CondaVerificationError: The package for wcslib located at /home/ramirez/.conda/pkgs/wcslib-7.12-h6195f97_0
+appears to be corrupted. The path 'include/wcslib/wcsconfig_f77.h'
+specified in the package manifest cannot be found.
+
+CondaVerificationError: The package for wcslib located at /home/ramirez/.conda/pkgs/wcslib-7.12-h6195f97_0
+appears to be corrupted. The path 'include/wcslib/wcserr.h'
+specified in the package manifest cannot be found.
+
+CondaVerificationError: The package for wcslib located at /home/ramirez/.conda/pkgs/wcslib-7.12-h6195f97_0
+appears to be corrupted. The path 'include/wcslib/wcsfix.h'
+specified in the package manifest cannot be found.
+
+CondaVerificationError: The package for wcslib located at /home/ramirez/.conda/pkgs/wcslib-7.12-h6195f97_0
+appears to be corrupted. The path 'include/wcslib/wcshdr.h'
+specified in the package manifest cannot be found.
+
+CondaVerificationError: The package for wcslib located at /home/ramirez/.conda/pkgs/wcslib-7.12-h6195f97_0
+appears to be corrupted. The path 'include/wcslib/wcslib.h'
+specified in the package manifest cannot be found.
+
+CondaVerificationError: The package for wcslib located at /home/ramirez/.conda/pkgs/wcslib-7.12-h6195f97_0
+appears to be corrupted. The path 'include/wcslib/wcsmath.h'
+specified in the package manifest cannot be found.
+
+CondaVerificationError: The package for wcslib located at /home/ramirez/.conda/pkgs/wcslib-7.12-h6195f97_0
+appears to be corrupted. The path 'include/wcslib/wcsprintf.h'
+specified in the package manifest cannot be found.
+
+CondaVerificationError: The package for wcslib located at /home/ramirez/.conda/pkgs/wcslib-7.12-h6195f97_0
+appears to be corrupted. The path 'include/wcslib/wcstrig.h'
+specified in the package manifest cannot be found.
+
+CondaVerificationError: The package for wcslib located at /home/ramirez/.conda/pkgs/wcslib-7.12-h6195f97_0
+appears to be corrupted. The path 'include/wcslib/wcsunits.h'
+specified in the package manifest cannot be found.
+
+CondaVerificationError: The package for wcslib located at /home/ramirez/.conda/pkgs/wcslib-7.12-h6195f97_0
+appears to be corrupted. The path 'include/wcslib/wcsutil.h'
+specified in the package manifest cannot be found.
+
+CondaVerificationError: The package for wcslib located at /home/ramirez/.conda/pkgs/wcslib-7.12-h6195f97_0
+appears to be corrupted. The path 'include/wcslib/wtbarr.h'
+specified in the package manifest cannot be found.
+
+CondaVerificationError: The package for wcslib located at /home/ramirez/.conda/pkgs/wcslib-7.12-h6195f97_0
+appears to be corrupted. The path 'lib/libpgsbox.so'
+specified in the package manifest cannot be found.
+
+CondaVerificationError: The package for wcslib located at /home/ramirez/.conda/pkgs/wcslib-7.12-h6195f97_0
+appears to be corrupted. The path 'lib/libpgsbox.so.7'
+specified in the package manifest cannot be found.
+
+CondaVerificationError: The package for wcslib located at /home/ramirez/.conda/pkgs/wcslib-7.12-h6195f97_0
+appears to be corrupted. The path 'lib/libpgsbox.so.7.12'
+specified in the package manifest cannot be found.
+
+SafetyError: The package for wcslib located at /home/ramirez/.conda/pkgs/wcslib-7.12-h6195f97_0
+appears to be corrupted. The path 'lib/libwcs-7.12.a'
+has an incorrect size.
+  reported size: 2161898 bytes
+  actual size: 344064 bytes
+
+CondaVerificationError: The package for wcslib located at /home/ramirez/.conda/pkgs/wcslib-7.12-h6195f97_0
+appears to be corrupted. The path 'lib/libwcs.so'
+specified in the package manifest cannot be found.
+
+CondaVerificationError: The package for wcslib located at /home/ramirez/.conda/pkgs/wcslib-7.12-h6195f97_0
+appears to be corrupted. The path 'lib/libwcs.so.7'
+specified in the package manifest cannot be found.
+
+CondaVerificationError: The package for wcslib located at /home/ramirez/.conda/pkgs/wcslib-7.12-h6195f97_0
+(base) -bash-4.2$
+specified in the package manifest cannot be found.
+
+CondaVerificationError: The package for wcslib located at /home/ramirez/.conda/pkgs/wcslib-7.12-h6195f97_0
+appears to be corrupted. The path 'lib/pkgconfig/wcslib.pc'
+specified in the package manifest cannot be found.
+
+CondaVerificationError: The package for wcslib located at /home/ramirez/.conda/pkgs/wcslib-7.12-h6195f97_0
+appears to be corrupted. The path 'share/man/man1/HPXcvt.1'
+specified in the package manifest cannot be found.
+
+CondaVerificationError: The package for wcslib located at /home/ramirez/.conda/pkgs/wcslib-7.12-h6195f97_0
+appears to be corrupted. The path 'share/man/man1/fitshdr.1'
+specified in the package manifest cannot be found.
+
+CondaVerificationError: The package for wcslib located at /home/ramirez/.conda/pkgs/wcslib-7.12-h6195f97_0
+appears to be corrupted. The path 'share/man/man1/sundazel.1'
+specified in the package manifest cannot be found.
+
+CondaVerificationError: The package for wcslib located at /home/ramirez/.conda/pkgs/wcslib-7.12-h6195f97_0
+appears to be corrupted. The path 'share/man/man1/tofits.1'
+specified in the package manifest cannot be found.
+
+CondaVerificationError: The package for wcslib located at /home/ramirez/.conda/pkgs/wcslib-7.12-h6195f97_0
+appears to be corrupted. The path 'share/man/man1/wcsgrid.1'
+specified in the package manifest cannot be found.
+
+CondaVerificationError: The package for wcslib located at /home/ramirez/.conda/pkgs/wcslib-7.12-h6195f97_0
+appears to be corrupted. The path 'share/man/man1/wcsware.1'
+specified in the package manifest cannot be found.
+
+ClobberError: This transaction has incompatible packages due to a shared path.
+  packages: fermi/noarch::fermitools-data-0.18-0, fermi/linux-64::fermitools-2.2.0-py39h93a0a19_0
+  path: 'share/fermitools/data/pulsarDb/outref/testEphComputerApp_par15.log'

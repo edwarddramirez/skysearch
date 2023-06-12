@@ -1,0 +1,368 @@
+Algorithm: All-Sky Search for Gamma-Ray Point Sources from Fermi-LAT Dataset 
+Directory: /het/p4/ramirez/gcewavelets/skysearch
+Author: Edward Ramirez
+Date: 05/02/2023
+
+################################################
+################# General Idea #################
+################################################
+We want to detect point sources on synthetic gamma-ray sky maps 
+using the flat continuous wavelet transform.
+
+This process takes several steps:
+
+1. Generate background map of events
+2. Inject point sources into the background map
+3. Generate projected patches of the sky 
+4. Generate grid points along the patches
+5. Calculate the CWT on the grid points
+6. Scan the map of wavelet coefficients for point sources
+   by using a peak-finding algorithm
+
+In this README file, we describe the relevant scripts used to execute
+these steps. 
+
+Most questions regarding my choices for writing the code in the way
+that I did are twofold.
+
+1. I wrote the code in a way where running many identical jobs in the 
+   farm would be as efficient as possible. The code was much simpler 
+   when I started developing it, but I had to start making it 
+   slightly more complicated to increase its efficiency.
+2. We want to perform this analysis over many different types of maps,
+   either because we want to consider different background maps, random samples
+   of background maps, random samples of injected point sources, or maps
+   filtered by energy bins. 
+   
+   On this note, we distinguish the type of maps we are working with
+   based on their directory names. Their file names are otherwise identical.
+   This allows us to write in our code in a way that doesn't rely on
+   too many "if" statements to specify which dataset we are working with. 
+
+################################################
+################# Instructions #################
+################################################
+
+1.0. Generate background map of events
+
+    Code: python generate_skymap.py [model] [trial_id]
+        
+        :param model = String specifying model used to generate map (e.g., SA0)
+        :param trial_id = String specifying trial for given model
+
+        :output = Array of datapoints for all energies
+            axis 0 = index of datapoint
+            axis 1 = properties of datapoint
+                [0] = longitude (rad)
+                [1] = latitude (rad)
+                [2] = energy (MeV)
+                [3] = energy bin
+        
+            save directory: data/maps/[model]_[trial_id]/bkgd
+            output file name: map.npy
+            
+        :output = Array of datapoints within a single energy bin with index [ie]
+            axis 0 = index of datapoint
+            axis 1 = properties of datapoint
+                [0] = longitude (rad)
+                [1] = latitude (rad)
+                [2] = energy (MeV)
+                [3] = energy bin [ie]
+        
+            save directory: data/maps/[model]_[trial_id]/bkgd/energy_bin_[ie]
+            output file name: map.npy
+            
+    Description: 
+        1. Load background map per unit exposure (HEALPix Counts / Exposure)
+        2. Apply exposure map for background map (HEALPix Counts)
+        3. Sample randomly over each pixel for map of events (Events)
+            NOTE: Still need to modify this step from Matt's code
+        4. Convert dictionary of map to a numpy array 
+        5. Save data array 
+        6. Save data within each energy bin [ie] in its own subdirectory
+             
+    Farm Instructions:
+        No Farm Code available since we can quickly make single iterations of the maps
+            
+
+2.0. Inject point sources into the background map
+    
+    Code: python inject_ps.py [model] [trial_id] [inj_id]
+    
+        :param model = String specifying model used to generate map (e.g., SA0)
+        :param trial_id = String specifying trial for given model
+        :param inj_id = String specifying the type of injected point source map
+        
+        :output = Array of point source datapoints for all energies
+            axis 0 = index of datapoint
+            axis 1 = properties of datapoint
+                [0] = longitude (rad)
+                [1] = latitude (rad)
+                [2] = energy (MeV)
+                [3] = energy bin
+        
+            save directory: data/maps/[model]_[trial_id]/bkgd_wps_[inj_id]
+            output file name: ps_map.npy
+            
+        :output = Array of point source datapoints within a single energy bin with index [ie]
+            axis 0 = index of datapoint
+            axis 1 = properties of datapoint
+                [0] = longitude (rad)
+                [1] = latitude (rad)
+                [2] = energy (MeV)
+                [3] = energy bin [ie]
+        
+            save directory: data/maps/[model]_[trial_id]/bkgd_wps_[inj_id]/energy_bin_[ie]
+            output file name: ps_map.npy
+            
+        :output = Array of all datapoints (bkgd + ps) for all energies
+            axis 0 = index of datapoint
+            axis 1 = properties of datapoint
+                [0] = longitude (rad)
+                [1] = latitude (rad)
+                [2] = energy (MeV)
+                [3] = energy bin
+        
+            save directory: data/maps/[model]_[trial_id]/bkgd_wps_[inj_id]
+            output file name: map.npy 
+            
+        :output = Array of all datapoints (bkgd + ps) within a single energy bin with index [ie]
+            axis 0 = index of datapoint
+            axis 1 = properties of datapoint
+                [0] = longitude (rad)
+                [1] = latitude (rad)
+                [2] = energy (MeV)
+                [3] = energy bin [ie]
+        
+            save directory: data/maps/[model]_[trial_id]/bkgd_wps_[inj_id]/energy_bin_[ie]
+            output file name: map.npy
+            
+        :output (OPTIONAL) = hexbin plot of total map (bkgd + ps)
+            (For more details, see the last block of code in the script)
+            
+    Description: 
+        1. Generate point source events by sampling points from a psf-scale gaussian 
+        2. Save data array 
+        3. Save data within each energy bin [ie] in its own subdirectory
+             
+    Farm Instructions:
+        1. python inj_makejob.py
+        2. cd inj_batch_exec
+        3. source do_all.src
+        
+        Purpose: Produce many injected point source maps for a given background map
+   
+        Note: Main thing to modify is the N_inj parameter, specifying the amount of different 
+        point source maps you want to produce
+        
+3.0. Generate projected patches of the sky 
+    
+    Code: python generate_patches.py [model] [trial_id] [energy_bin] [map_type] [npix] [inj_id]
+    
+        :param model = String specifying model used to generate map (e.g., SA0)
+        :param trial_id = String specifying trial for given model
+        :param energy_bin = String specifying index of energy bin
+        :param map_type = String specifying if we will generate patches from the bkgd map or total map 
+                          (possible choices: 'bkgd' = bkgd , 'all' = bkgd + ps, -1 = 'all')
+        :param npix = String specifying father pixel 
+        :param inj_id = String specifying the type of injected point source map (omit if map_type == 'all')
+        
+        :output = Dictionary of projected map at each pixel
+            :key 'center_coords' = Center of projected map relative to spherical coordinate system (l,b) (rad)
+            :key 'search_region_points' = Projected datapoints contained within father pixel (rad)
+            :key 'search_region_edge' = Projected edge points of father pixel (rad)
+            :key 'outer_region_points' = Points defining first band lying outside of father pixel
+            :key 'outer_region_edge' = Edge of first band defined using the alpha shape of the outer set
+                                               (for grid points extending farther than the search region)
+            :key 'outmost_region_points' = Points defining second band lying outside of father pixel 
+                                               (for better wavelet estimation)
+            :key 'all_points' = Points contained in all regions
+            
+            save files:
+                if map_type == 'bkgd':
+                    map_dir = 'bkgd'
+                elif map_type == 'all':
+                    map_dir == 'bkgd_wps_[inj_id]'
+                    
+                if energy_bin == 'all':
+                    save directory = data/maps/[model]_[trial_id]/[map_dir]/projected_maps/map_[npix]
+                elif energy_bin == 'ie':
+                    save directory = data/maps/[model]_[trial_id]/[map_dir]/energy_bin_[ie]/projected_maps/map_[npix]
+            
+                output file name: projected_map_dict.npz
+        
+    Description:
+        1. Load data array
+        2. Generate HEALPix father pixels
+        3. Group data based on father pixel occupation 
+        4. Project father pixel [npix] and spherical positions of data within pixel 
+           to the tangent plane defined by father pixel
+        5. Generate extra "bands" (outer and outmost) of data as described in "ed_notes_2.pdf"
+           (and the boundary of the outer band for grid point generation)
+        
+    Farm Instructions:
+        1. python gpb_makejob.py
+        2. cd gpb_batch_exec
+        3. source do_all.src
+        
+    Comment: This piece of code can make patches for any map that we desire, but it becomes too inefficient
+             if we plan on analyzing thousands of injected point source maps.
+        
+3.1.1. Save on computational time: generate patches of the sky in two steps
+    Idea: Our data will mostly consist of background events. Moreover, besides the points that are projected,
+          the only other slight difference that maps will give are the boundaries that they define for
+          the 'outer_region_edge'. 
+          
+          * Since we want the 'outer_region_edge' to be as far from the father pixel as possible given the definition of 
+            the band of points that define it, we should use as many points as possible to define this.
+          * Since all our injected point source maps will have the background events in common, it is much more efficient
+            to define this 'outer_region_edge' using the background alone. This means we only need to perform this 
+            step once for a given background map.
+    
+    Farm Instructions:
+        1. python gpb_makejob.py 
+            (with [energy_bin] = 'all' and [map_type] = 'bkgd')
+        2. cd gpb_batch_exec
+        3. source do_all.src
+        
+3.1.2. Project the point source maps separately and combine with background map projection
+    
+    Code: python generate_patches_ps.py [model] [trial_id] [energy_bin] [npix] [inj_id]
+    
+        :param model = String specifying model used to generate map (e.g., SA0)
+        :param trial_id = String specifying trial for given model
+        :param energy_bin = String specifying index of energy bin
+        :param npix = String specifying father pixel 
+        :param inj_id = String specifying the type of injected point source map 
+        
+        :output = Dictionary of projected map at each father pixel
+            :key 'center_coords' = Center of projected map relative to spherical coordinate system (l,b) (rad)
+            :key 'search_region_points' = Projected datapoints (bkgd + ps) contained within father pixel (rad)
+            :key 'search_region_edge' = Projected edge points of father pixel (rad)
+            :key 'outer_region_points' = Points (bkgd + ps) defining first band lying outside of father pixel
+            :key 'outer_region_edge' = Edge of first band defined using the alpha shape of the outer set
+                                               (this time, this is loaded from the background map)
+                                               (for grid points extending farther than the search region)
+            :key 'outmost_region_points' = Points (bkgd + ps) defining second band lying outside of father pixel 
+                                               (for better wavelet estimation)
+            :key 'all_points' = Points (bkgd + ps) contained in all regions
+            
+            save files:
+                if energy_bin == 'all':
+                    save directory = data/maps/[model]_[trial_id]/bkgd_wps_[inj_id]/projected_maps/map_[npix]
+                elif energy_bin == 'ie':
+                    save directory = data/maps/[model]_[trial_id]/bkgd_wps_[inj_id]/energy_bin_[ie]/projected_maps/map_[npix]
+            
+                output file name: projected_map_dict.npz
+                
+        :output = Same dictionary as above for point sources, not including the 'outer_region_edge'
+            output file name: ps_projected_map_dict.npz
+            
+        :output (OPTIONAL): Plot the data and regions
+            (for more details, see the code)
+
+    Description:
+        1. Load point source data arrays
+        2. Generate HEALPix father pixels
+        3. Group data based on father pixel occupation 
+        4. Project father pixel [npix] and spherical positions of data within pixel 
+           to the tangent plane defined by father pixel
+        5. Generate extra "bands" (outer and outmost) of data as described in "ed_notes_2.pdf"
+        6. Load the dictionary of background map projected data and combine with the point source
+           projected data. The "boundary" curve used to generate grid points outside the father pixel
+           is the one obtained using the background data. 
+        
+    Farm Instructions:
+        1. python gpa_makejob.py 
+        2. cd gpa_batch_exec
+        3. source do_all.src
+        
+4. Generate grid points for all patches of the sky
+    
+    Code: generate_grid_points.py [model] [trial_id] [energy_bin] [map_type] [grid_scale_deg] [inj_id]
+    
+        :param model = String specifying model used to generate map (e.g., SA0)
+        :param trial_id = String specifying trial for given model
+        :param energy_bin = String specifying index of energy bin
+        :param map_type = String specifying if we will generate patches from the bkgd map or total map 
+                          (possible choices: 'bkgd' = bkgd , 'all' = bkgd + ps, -1 = 'all')
+        :param grid_scale_deg = String specifying spacing between grid points (degrees)
+                                (hexfarm: 0.1 deg ~ 10 gb RAM for crude synthetic maps)
+                                (near disk, may need to resort to the "b_line" approach from cwt_v0.1_play)
+        :param inj_id = String specifying the type of injected point source map 
+        
+        :output = Dictionary of grid points for each father pixel
+            :key 'grid' = indices of grid points inside pixel edge (relative to mesh grid data shape)
+            :key 'rectangular_grid' = (x,y) mesh grid
+            :key 'rectangular_grid_points' = list of points making up (x,y) mesh grid
+            :key 'grid_flat' = flattened set of indices given by 'grid'
+            :key 'arr_bx_plot' = array of lower-bound of "x-bins" used to define x-grid points
+            :key 'arr_by_plot' = array of lower-bound of "y-bins" used to define y-grid points
+            
+        save files:
+                if map_type == 'bkgd':
+                    map_dir = 'bkgd'
+                elif map_type == 'all':
+                    map_dir == 'bkgd_wps_[inj_id]'
+                    
+                if energy_bin == 'all':
+                    save directory = data/maps/[model]_[trial_id]/[map_dir]/projected_maps/map_[npix]
+                elif energy_bin == 'ie':
+                    save directory = data/maps/[model]_[trial_id]/[map_dir]/energy_bin_[ie]/projected_maps/map_[npix]
+            
+                output file name: grid_dict_[grid_scale_deg].npz
+                
+        Description:
+            1. Load 'outer_region_edge' from given background map
+            2. Generate mesh grid with spacing [grid_scale_deg]
+            3. Filter out grid points outside 'outer_region_edge' to threshold wavelet map
+            
+       Farm Instructions:
+           None so far. Code runs fast enough as it is.
+           
+5. Generate wavelet coefficients in the grid
+    
+    Code: generate_wavelet_coefficients.py [model] [trial_id] [energy_bin] [map_type] [npix] [grid_scale_deg] \\
+                                           [wavelet_name] [a_deg] [inj_id]
+                                           
+        :param model = String specifying model used to generate map (e.g., SA0)
+        :param trial_id = String specifying trial for given model
+        :param energy_bin = String specifying index of energy bin
+        :param map_type = String specifying if we will generate patches from the bkgd map or total map 
+                          (possible choices: 'bkgd' = bkgd , 'all' = bkgd + ps, -1 = 'all')
+        :param npix = String specifying father pixel 
+        :param grid_scale_deg = String specifying spacing between grid points (deg)
+                                (hexfarm: 0.1 deg ~ 10 gb RAM for crude synthetic maps)
+                                (near disk, may need to resort to the "b_line" approach from cwt_v0.1_play)
+        :param wavelet_name = String specifying name of wavelet (see _wavelets.py for options)
+        :param a_deg = wavelet scale parameter (deg)
+        :param inj_id = String specifying the type of injected point source map 
+        
+        :output = Array along the grid of wavelet coefficients, thresholded to zero outside the boundary given by 'outer_region_edge'
+            axis 0 = x-coordinate of grid point
+            axis 1 = y-coordinate of grid point
+            axis 2 = scale parameter
+            
+        save files:
+                if map_type == 'bkgd':
+                    map_dir = 'bkgd'
+                elif map_type == 'all':
+                    map_dir == 'bkgd_wps_[inj_id]'
+                    
+                if energy_bin == 'all':
+                    save directory = data/maps/[model]_[trial_id]/[map_dir]/projected_maps/map_[npix]
+                elif energy_bin == 'ie':
+                    save directory = data/maps/[model]_[trial_id]/[map_dir]/energy_bin_[ie]/projected_maps/map_[npix]
+            
+                output file name: [wavelet_name]_coefficient_map_[a_deg]_[grid_scale_deg].npz
+                
+        Description:
+            1. Load projected data dictionaries and grid points
+            2. Calculate the wavelet coefficients at each grid point
+                - Caution: The combination of thresholding and broadcasting can be a bit confusing
+                           but have been shown to be valid through plots and more careful broadcasting
+
+    Farm Instructions:
+        1. python wt_makejob.py 
+        2. cd wt_batch_exec
+        3. source do_all.src
