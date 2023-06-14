@@ -30,14 +30,14 @@ for m in tqdm(range(len(inj_id_list))):
     if energy_bin == 'all' or energy_bin == str(-1):
         if map_type == 'bkgd':
             map_dir = model_dir + 'bkgd/'
-        elif map_type == 'all':
+        elif map_type == 'all' or map_type == 'ps':
             map_dir = model_dir + ('bkgd_wps_' + inj_id + '/') 
     else:
         ie = int(float(energy_bin))
         if map_type == 'bkgd':
             bkgd_dir = model_dir + 'bkgd/'
             map_dir = bkgd_dir + 'energy_bin_' + str(ie) + '/'
-        elif map_type == 'all':
+        elif map_type == 'all' or map_type == 'ps':
             bkgd_wps_dir = model_dir + ('bkgd_wps_' + inj_id + '/')
             map_dir = bkgd_wps_dir + 'energy_bin_' + str(ie) + '/'  
 
@@ -45,7 +45,10 @@ for m in tqdm(range(len(inj_id_list))):
     npix = int( float(sys.argv[5]) )
     data_dir = map_dir + 'projected_maps/' 
     patch_dir = data_dir + 'map_' + str(npix) + '/'
-    projected_map_name = 'projected_map_dict.npz'
+    if map_type == 'all' or map_type == 'bkgd':
+        projected_map_name = 'projected_map_dict.npz'
+    elif map_type == 'ps':
+        projected_map_name = 'ps_projected_map_dict' + '.npz'
     projected_map = dict(np.load(patch_dir + projected_map_name))
     data = projected_map['all_points']
 
@@ -99,7 +102,10 @@ for m in tqdm(range(len(inj_id_list))):
 
     # save coefficient estimate
     str_a_deg = str.format('{0:.5f}',a_deg)
-    file_name = wavelet_name + '_' + 'coefficient_map' + '_' + str_a_deg + '_' + str_grid_scale_deg
+    if map_type == 'all' or map_type == 'bkgd':
+        file_name = wavelet_name + '_' + 'coefficient_map' + '_' + str_a_deg + '_' + str_grid_scale_deg
+    elif map_type == 'ps':
+        file_name = wavelet_name + '_' + 'ps_coefficient_map' + '_' + str_a_deg + '_' + str_grid_scale_deg 
 
     np.save(patch_dir + file_name, coefficient_map)
 

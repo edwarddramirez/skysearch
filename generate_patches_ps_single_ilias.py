@@ -121,13 +121,6 @@ for m in range(len(inj_id_list)):
     projected_map['all_points'] = r_all
     projected_map['outmost_region_points'] = maps.remove_points_from_array_(r_all,r_pix_and_out)
 
-    # save file
-    patch_dir = data_dir + 'map_' + str(npix) + '/'
-    print(patch_dir)
-    os.system("mkdir -p "+patch_dir)
-    file_name = 'ps_projected_map_dict.npz'
-    np.savez(patch_dir + file_name, **projected_map)
-
     # load background patch data to combine with ps data
     if energy_bin == 'all' or energy_bin == str(-1):
         bkgd_patch_dir = model_dir + 'bkgd/' + 'projected_maps/' + 'map_' + str(npix) + '/'
@@ -160,9 +153,22 @@ for m in range(len(inj_id_list)):
     # bkgd_projected_map_all_energies = dict(np.load(bkgd_patch_dir_all_energies + 'projected_map_dict.npz'))
     tot_projected_map['outer_region_edge'] = bkgd_projected_map['outer_region_edge']
 
+    patch_dir = data_dir + 'map_' + str(npix) + '/'
+    print(patch_dir)
+    os.system("mkdir -p "+patch_dir)
     file_name = 'projected_map_dict.npz'
     np.savez(patch_dir + file_name, **tot_projected_map)
 
+    # ============== MODIFICATION HERE ==================
+    # instead of saving ps-only data earlier, allow ps-only dictionary to have the outer region
+    # and outmost regions defined by all background points
+    ps_projected_map = projected_map
+    ps_projected_map['outer_region_edge'] = bkgd_projected_map['outer_region_edge']
+    ps_projected_map['center_coords'] = bkgd_projected_map['center_coords']
+
+    file_name = 'ps_projected_map_dict.npz'
+    np.savez(patch_dir + file_name, **projected_map)
+    
 #     # plot results as a check
 #     x_edge = r_edge[:,0] ; y_edge = r_edge[:,1]
 
