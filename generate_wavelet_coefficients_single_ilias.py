@@ -78,12 +78,12 @@ for m in tqdm(range(len(inj_id_list))):
 
     # broadcast arrays in wavelet calculation
     buf_data = data[np.newaxis,np.newaxis,np.newaxis]
-    buf_mesh_bxby = mesh_bxby[:,:,np.newaxis,np.newaxis,np.newaxis]
+    buf_mesh_bxby = mesh_bxby[grid][:,np.newaxis,np.newaxis,np.newaxis]
     buf_arr_a = arr_a[np.newaxis, np.newaxis, :, np.newaxis, np.newaxis]
 
     # calculate arguments of wavelet coefficients
     # buf_grid = grid[:,:,np.newaxis,np.newaxis,np.newaxis]
-    buf_arr_arg_grid =  ( (buf_data - buf_mesh_bxby ) / buf_arr_a )[grid]
+    buf_arr_arg_grid =  ( (buf_data - buf_mesh_bxby ) / buf_arr_a )
 
     # calculate wavelet coefficients
     buf_mexh_output_grid = mexh.base_fct(buf_arr_arg_grid)

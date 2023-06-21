@@ -64,13 +64,13 @@ Ny, Nx = mesh_bxby.shape[:-1]
 coefficient_map = np.zeros((Ny, Nx, 1))
 
 buf_data = data[np.newaxis,np.newaxis,np.newaxis]
-buf_mesh_bxby = mesh_bxby[:,:,np.newaxis,np.newaxis,np.newaxis]
+buf_mesh_bxby = mesh_bxby[grid][:,np.newaxis,np.newaxis,np.newaxis]
 buf_arr_a = arr_a[np.newaxis, np.newaxis, :, np.newaxis, np.newaxis]
 
 # buf_grid = grid[:,:,np.newaxis,np.newaxis,np.newaxis]
 # print(buf_grid.shape)
 # print(buf_mesh_bxby[buf_grid].shape)
-buf_arr_arg_grid =  ( (buf_data - buf_mesh_bxby ) / buf_arr_a )[grid]
+buf_arr_arg_grid =  ( (buf_data - buf_mesh_bxby ) / buf_arr_a )
 # print(buf_arr_arg_grid.shape)
 
 buf_mexh_output_grid = mexh.base_fct(buf_arr_arg_grid)

@@ -3,6 +3,7 @@ import sys
 import numpy as np
 import _wavelets as wt
 import os
+from tqdm import tqdm
 
 ti = timeit.default_timer()
 
@@ -67,33 +68,43 @@ N_data, N_dim = data.shape
 Ny, Nx = mesh_bxby.shape[:-1]
 coefficient_map = np.zeros((Ny, Nx, 1))
 
-# broadcast arrays in wavelet calculation
-buf_data = data[np.newaxis,np.newaxis,np.newaxis]
-buf_mesh_bxby = mesh_bxby[grid][:,np.newaxis,np.newaxis,np.newaxis]
-buf_arr_a = arr_a[np.newaxis, np.newaxis, :, np.newaxis, np.newaxis]
+# extra step: load array of y-values
+arr_by_plot = grid_dict['arr_by_plot']
+arr_by = 0.5 * (arr_by_plot[:-1] + arr_by_plot[1:])
 
-# calculate arguments of wavelet coefficients
-# buf_grid = grid[:,:,np.newaxis,np.newaxis,np.newaxis]
-buf_arr_arg_grid =  ( (buf_data - buf_mesh_bxby ) / buf_arr_a )
+for ny in tqdm(range(Ny)):
+    by = arr_by[ny]
+    ny = np.where(mesh_bxby[grid][:,1] == by)
 
-# calculate wavelet coefficients
-buf_mexh_output_grid = mexh.base_fct(buf_arr_arg_grid)
+    grid_bx = ( mesh_bxby[:,:,1] == by ) & (grid)
 
-# remove two dimensions of a-array to divide mexh
-buf_arr_a_sq = np.squeeze(buf_arr_a, axis = -1)
-buf_arr_a_sq = np.squeeze(buf_arr_a_sq, axis = -1)
+    # broadcast arrays in wavelet calculation
+    buf_data = data[np.newaxis,np.newaxis,np.newaxis]
+    buf_mesh_bxby = mesh_bxby[grid_bx][:,np.newaxis,np.newaxis,np.newaxis]
+    buf_arr_a = arr_a[np.newaxis, np.newaxis, :, np.newaxis, np.newaxis]
 
-# estimate wavelet coefficient by summing over datapoints
-coefficient_map_flat = np.sum(buf_mexh_output_grid, axis = -1) / buf_arr_a_sq / N_data
-coefficient_map_flat_sq = np.squeeze(coefficient_map_flat, axis = -1)
+    # calculate arguments of wavelet coefficients
+    # buf_grid = grid[:,:,np.newaxis,np.newaxis,np.newaxis]
+    buf_arr_arg_grid =  ( (buf_data - buf_mesh_bxby ) / buf_arr_a )
 
-# note that buf_arr_arg_grid is flattened relative to the shape of mesh_bxby
-# applying grid to coefficient_map automatically flattens coefficient_map to match to coefficient_map_flat_sq
-coefficient_map[grid] = coefficient_map_flat_sq
+    # calculate wavelet coefficients
+    buf_mexh_output_grid = mexh.base_fct(buf_arr_arg_grid)
+
+    # remove two dimensions of a-array to divide mexh
+    buf_arr_a_sq = np.squeeze(buf_arr_a, axis = -1)
+    buf_arr_a_sq = np.squeeze(buf_arr_a_sq, axis = -1)
+
+    # estimate wavelet coefficient by summing over datapoints
+    coefficient_map_flat = np.sum(buf_mexh_output_grid, axis = -1) / buf_arr_a_sq / N_data
+    coefficient_map_flat_sq = np.squeeze(coefficient_map_flat, axis = -1)
+
+    # note that buf_arr_arg_grid is flattened relative to the shape of mesh_bxby
+    # applying grid to coefficient_map automatically flattens coefficient_map to match to coefficient_map_flat_sq
+    coefficient_map[grid_bx] = coefficient_map_flat_sq
 
 # save coefficient estimate
 str_a_deg = str.format('{0:.5f}',a_deg)
-file_name = wavelet_name + '_' + 'coefficient_map' + '_' + str_a_deg + '_' + str_grid_scale_deg
+file_name = wavelet_name + '_' + 'coefficient_map_test' + '_' + str_a_deg + '_' + str_grid_scale_deg
 
 np.save(patch_dir + file_name, coefficient_map)
 
