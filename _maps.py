@@ -59,9 +59,9 @@ def generate_energy_bins_(choice=1):
         energy_centers = np.logspace( np.log10(50),np.log10(814008.272176),38)
         return [energy_list, energy_centers]
 
-def psf_(energy,popt): 
+def sigma_psf_(energy,popt): 
     """
-    Gaussian fit of PSF:
+    Fit of Gaussian PSF's sigma parameter:
         x = log(E)
         PSF(E) = ax^2 + bx + c
     
@@ -83,7 +83,7 @@ def healpix_counts_to_events_(random_map, energy_list, popt, nside=256):
     
     :param random_map = random generation of (background) map
     :param energy_list = list specifying energy bins (see generate_energy_bins_ fct)
-    :param popt = quadratic fit parameters (see psf_ fct)
+    :param popt = quadratic fit parameters (see sigma_psf_ fct)
     :param nside = number of sides of healpix pixels (default = 256)
     
     :output = dictionary with event data
@@ -136,7 +136,7 @@ def healpix_counts_to_events_(random_map, energy_list, popt, nside=256):
         theta_events = coordinates.b.rad
         phi_events = coordinates.l.rad
 
-        angular_offsets = np.random.normal(size=len(theta_events),scale=psf_(energy_events, popt))*u.rad
+        angular_offsets = np.random.normal(size=len(theta_events),scale=sigma_psf_(energy_events, popt))*u.rad
         azimuthal_offsets = np.random.uniform(size=len(theta_events),low=0,high=2*np.pi)*u.rad
 
         coordinates_new = coordinates.directional_offset_by(azimuthal_offsets, angular_offsets)
@@ -212,7 +212,7 @@ def beta_healpix_counts_to_events_(random_map, energy_list, popt, nside=256):
         theta_events = coordinates.b.rad
         phi_events = coordinates.l.rad
 
-        angular_offsets = np.random.normal(size=len(theta_events),scale=psf_(energy_events, popt))*u.rad
+        angular_offsets = np.random.normal(size=len(theta_events),scale=sigma_psf_(energy_events, popt))*u.rad
         azimuthal_offsets = np.random.uniform(size=len(theta_events),low=0,high=2*np.pi)*u.rad
 
         coordinates_new = coordinates.directional_offset_by(azimuthal_offsets, angular_offsets)
@@ -233,7 +233,7 @@ def generate_pointsource_(l,b,photon_number,energy_list,popt,energy_bin=0,random
     :param l = longitude of point source (l \in [0,2\pi])
     :param b = latitude of point source (b \in [-\pi/2, \pi/2])
     :param energy_list = list specifying energy bins (see generate_energy_bins_ fct)
-    :param popt = quadratic fit parameters (see psf_ fct)
+    :param popt = quadratic fit parameters (see sigma_psf_ fct)
     :param energy_bin = index corresponding to energy bin of choice
     :param randomize_number = boolean type indicating whether number of events drawn randomly
     
@@ -265,7 +265,7 @@ def generate_pointsource_(l,b,photon_number,energy_list,popt,energy_bin=0,random
     coordinates = SkyCoord(l=l_list*u.rad,b=b_list*u.rad,frame=Galactic)
     
     #generate offsets from point source with gaussian with appropriate psf 
-    angular_offsets = np.random.normal(size=counts,scale=psf_(energy_events, popt))*u.rad
+    angular_offsets = np.random.normal(size=counts,scale=sigma_psf_(energy_events, popt))*u.rad
     azimuthal_offsets = np.random.uniform(size=counts,low=0,high=2*np.pi)*u.rad
     
     
@@ -291,7 +291,7 @@ def generate_point_sources_inside_curve_(N_ps, N_counts, npix, lon_edge, lat_edg
     :param lon_edge = longitude of father pixel edge
     :param lat_edge = latitude of father pixel edge
     :param energy_list = list specifying energy bins (see generate_energy_bins_ fct)
-    :param popt = quadratic fit parameters (see psf_ fct)
+    :param popt = quadratic fit parameters (see sigma_psf_ fct)
     :param energy_bin = index corresponding to energy bin of choice
     :param randomize_number = boolean type indicating whether number of events drawn randomly
     
