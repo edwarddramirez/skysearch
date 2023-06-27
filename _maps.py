@@ -63,7 +63,7 @@ def sigma_psf_(energy,popt):
     """
     Fit of Gaussian PSF's sigma parameter:
         x = log(E)
-        PSF(E) = ax^2 + bx + c
+        SIGMA_PSF(E) = ax^2 + bx + c
     
     :param energy = energy (MeV)
     :param popt = quadratic fit parameters [a,b,c] 
