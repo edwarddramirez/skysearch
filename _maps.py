@@ -2,6 +2,7 @@ import numpy as np
 import astropy as ap
 import astropy.units as u
 from astropy.coordinates import SkyCoord, Galactic
+from scipy.interpolate import interp1d
 
 from astropy_healpix import HEALPix
 import healpy as hp
@@ -266,6 +267,69 @@ def generate_pointsource_(l,b,photon_number,energy_list,popt,energy_bin=0,random
     
     #generate offsets from point source with gaussian with appropriate psf 
     angular_offsets = np.random.normal(size=counts,scale=sigma_psf_(energy_events, popt))*u.rad
+    azimuthal_offsets = np.random.uniform(size=counts,low=0,high=2*np.pi)*u.rad
+    
+    
+    coordinates_new = coordinates.directional_offset_by(azimuthal_offsets, angular_offsets)
+    
+    ps_dict = {}
+    ps_dict['center_coords'] = np.array([l,b]) 
+    ps_dict['energies'] = energy_events
+    ps_dict['coords'] = coordinates
+    ps_dict['smeared_coords'] = coordinates_new
+    
+    return ps_dict
+
+def king2_generate_pointsource_(l,b,photon_number,energy_list,energy_bin=0,randomize_number=False,interpolation_functions):
+    """
+    TODO: Incorporate this to new version of code
+
+    Generate double-king point source events from central position and Poisson average.
+        * The total number of events are drawn from a Poisson distribution at each energy bin.
+        * Distribution of events is uniform in energy.
+    
+    :param l = longitude of point source (l \in [0,2\pi])
+    :param b = latitude of point source (b \in [-\pi/2, \pi/2])
+    :param energy_list = list specifying energy bins (see generate_energy_bins_ fct)
+    :param energy_bin = index corresponding to energy bin of choice
+    :param randomize_number = boolean type indicating whether number of events drawn randomly
+    :param interpolation_functions = list of interpolation functions determined by "interpolate_king_parameters_"
+    
+    :output = dictionary with point source data
+        :key 'center_coords' = (l,b)-coordinates of point source center (rad) 
+        :key 'energies' = energies of point source events (MeV)
+        :key 'coords' = true (l,b)-coordinates of point source events (rad) 
+        :key 'smeared_coords' = true (l,b)-coordinates of point source events (rad) 
+
+    NOTE: Valid only for FRONT (see interpolate_king_parameters_ for details)
+            and CLEAN events (see zhong_fit_params folder)
+    """
+    #l, b in rad
+    if randomize_number:
+        counts = np.random.poisson(lam=photon_number)
+    else:
+        counts = photon_number
+    
+    #generate energies appropriate for the energy bin (uniform distribution for now)
+    low = energy_list[energy_bin]
+    if energy_bin!= len(energy_list)-1:
+        high = energy_list[energy_bin+1]
+    else:
+        high = 1.8*energy_list[-1]
+
+    energy_events = np.random.uniform(size=counts,low=low,high=high)    
+    
+    #create list of skycoords at the ps center
+    l_list = l*np.ones(counts)
+    b_list = b*np.ones(counts)
+    
+    coordinates = SkyCoord(l=l_list*u.rad,b=b_list*u.rad,frame=Galactic)
+    
+    #generate offsets from point source with gaussian with appropriate psf 
+    scaled_angular_offsets = generate_samples_psf_(N=counts,energy_events,interpolation_functions)
+    scale_factors = psf_scale_factor_(energy_events)
+
+    angular_offsets = (scaled_angular_offsets * scale_factors) * u.rad
     azimuthal_offsets = np.random.uniform(size=counts,low=0,high=2*np.pi)*u.rad
     
     
@@ -1220,6 +1284,274 @@ def generate_grid_points_(x_edge, y_edge, grid_scale, return_arrays_for_plotting
         return [grid, mesh_bxby, arr_b]
     else:
         return [grid, mesh_bxby, arr_b, grid_flat, arr_bx_plot, arr_by_plot]
+
+# ======================================================================
+# ======================================================================
+
+# ======================================================================
+# ======================================================================
+                # GENERATING SAMPLES FROM DOUBLE-KING PROFILE
+    # References:
+        # Development Directory: od/projects/pswavelets/gce/notebooks
+            # psf_king_zhong_patch.ipynb
+            # psf_fitting_king_zhong.ipynb
+    # Theoretical Description:
+        # overleaf: pswavelets
+# ======================================================================
+# ======================================================================
+
+def king_(x,s,g):
+    '''
+    King profile (see Eq (3) 1309.5416)
+    
+    NOTE: This is a function of the angular deviation (radial distance).
+    Therefore, the distribution is given by the expression in Eq (3) in 1309.5416
+    multiplied by a factor of 2 \pi x, as we integrate over the azimuthal angles.
+
+    Parameters
+    ----------
+    x : float
+        angular deviation from the center
+    s : float
+        sigma parameter
+    g : float
+        gamma parameter
+
+    Returns
+    -------
+    float
+        King profile
+
+    '''
+    return x * (1 - 1 / g) * (1 + (x*x / 2 / s/s / g))**(-g) / s / s
+
+def king2_(x,s1,g1,s2,g2,f):
+    '''
+    Double King profile
+
+    Parameters
+    ----------
+    x : float
+        angular deviation from center
+    s1 : float
+        core sigma parameter
+    g1 : float
+        core gamma parameter
+    s2 : float
+        tail sigma parameter
+    g2 : float
+        tail gamma parameter
+    f : float
+        fraction of the tail king profile
+
+    Returns
+    -------
+    float
+        Double King profile
+    '''
+    return f * king_(x,s1,g1) + (1 - f) * king_(x,s2,g2)
+
+def king_inv_cdf_(F,s,g):
+    """
+    Inverse cdf of King profile
+
+    Parameters
+    ----------
+    F : float
+        cdf
+    s : float
+        sigma parameter
+    g : float
+        gamma parameter
+        
+    Returns
+    -------
+    float
+        inverse cdf
+    """
+    return (2 * g * s**2. * ( (1 - F)**(- 1 / (g - 1) ) - 1. ))**(0.5)
+
+def generate_samples_king_(N,s,g):
+    """
+    Generate samples from King profile
+    using inverse transform technique
+    
+    Parameters
+    ----------
+    N : int
+        number of samples
+    s : float
+        sigma parameter
+    g : float   
+        gamma parameter
+
+    Returns
+    ------- 
+    array
+        samples from King profile    
+    """
+    uniform_samples = np.random.uniform(0,1,N)
+    return king_inv_cdf_(uniform_samples,s,g)
+
+def generate_samples_king2_(N,s1,g1,s2,g2,f):
+    """
+    Generate samples from Double King profile
+    using inverse transform technique
+
+    Parameters
+    ----------
+    N : int
+        number of samples
+    s1 : float
+        core sigma parameter
+    g1 : float  
+        core gamma parameter
+    s2 : float
+        tail sigma parameter
+    g2 : float
+        tail gamma parameter
+    f : float
+        fraction of the tail king profile
+
+    Returns
+    ------- 
+    array
+        samples from Double King profile
+    """
+    king2_samples = np.empty(N)
+
+    uniform_samples_1 = np.random.uniform(0,1,N)
+    king_rvs_1 = king_inv_cdf_(uniform_samples_1,s1,g1)
+
+    uniform_samples_2 = np.random.uniform(0,1,N)
+    king_rvs_2 = king_inv_cdf_(uniform_samples_2,s2,g2)
+
+    arr_bool = (np.random.uniform(low = 0, high = 1, size = N) <= f)
+    king2_samples[arr_bool] = king_rvs_1[arr_bool]
+    king2_samples[~arr_bool] = king_rvs_2[~arr_bool]
+
+    return king2_samples
+
+def interpolate_king_parameters_():
+    """
+    Interpolate empirically fit 
+    double-King profile parameters as a function of energy
+    
+    Parameters
+    ----------
+    None
+
+    Returns
+    ------- 
+    list 
+        function
+            interpolation of score vs logE
+        function
+            interpolation of gcore vs logE
+        function
+            interpolation of stail vs logE
+        function
+            interpolation of gtail vs logE
+        function
+            interpolation of fcore vs logE
+    """
+    
+    # load zhong's psf fit data
+    username="ramirez"
+    local_dir = "/het/p4/"+username+"/gcewavelets/skysearch/"
+    params_dir = local_dir + 'data/zhong/zhong_psf_params/'
+
+    arr_E = np.loadtxt(params_dir + 'CLEAN_FRONT_gcore_vs_E.dat')[:,0]
+    arr_logE = np.log10(arr_E)
+
+    arr_score = np.loadtxt(params_dir + 'CLEAN_FRONT_score_vs_E.dat')[:,1]
+    arr_stail = np.loadtxt(params_dir + 'CLEAN_FRONT_stail_vs_E.dat')[:,1]
+    arr_gcore = np.loadtxt(params_dir + 'CLEAN_FRONT_gcore_vs_E.dat')[:,1]
+    arr_gtail = np.loadtxt(params_dir + 'CLEAN_FRONT_gtail_vs_E.dat')[:,1]
+    arr_Ntail = np.loadtxt(params_dir + 'CLEAN_FRONT_Ntail_vs_E.dat')[:,1]
+    arr_fcore = 1 - arr_Ntail # fraction of core (notation consistent with reference)
+
+    f_E_score = interp1d(arr_logE, arr_score, kind='cubic',assume_sorted=True)
+    f_E_stail = interp1d(arr_logE, arr_stail, kind='cubic')
+    f_E_gcore = interp1d(arr_logE, arr_gcore, kind='cubic')
+    f_E_gtail = interp1d(arr_logE, arr_gtail, kind='cubic')
+    f_E_fcore = interp1d(arr_logE, arr_fcore, kind='cubic')
+
+    return [f_E_score, f_E_gcore, f_E_stail,  f_E_gtail, f_E_fcore]
+
+# define the psf in terms of the interpolated data
+
+def psf_(x, E, interpolation_functions):
+    '''
+    Double King profile over interpolated fit parameters
+
+    Parameters
+    ----------
+    x : float
+        angular deviation from center (deg)
+    E : float
+        energy (MeV)
+    interpolation_functions : list
+        list of interpolation functions determined by "interpolate_king_parameters_()"
+
+    Returns
+    -------
+    float
+        Double King profile
+    '''
+    
+    logE = np.log10(E)
+    f_E_score, f_E_gcore, f_E_stail,  f_E_gtail, f_E_fcore = interpolation_functions
+    return king2_(x, f_E_score(logE), f_E_gcore(logE), f_E_stail(logE), f_E_gtail(logE), f_E_fcore(logE))
+
+def generate_samples_psf_(N, E, interpolation_functions):
+    """
+    Generate samples from PSF
+    using inverse transform technique
+
+    Parameters
+    ----------
+    N : int
+        number of samples
+    E : float
+        energy
+    interpolation_functions : list
+        list of interpolation functions determined by "interpolate_king_parameters_()"
+
+    Returns
+    ------- 
+    array
+        samples from PSF
+    """
+    logE = np.log10(E)
+    f_E_score, f_E_gcore, f_E_stail,  f_E_gtail, f_E_fcore = interpolation_functions
+    
+    s1 = f_E_score(logE)
+    g1 = f_E_gcore(logE)
+    s2 = f_E_stail(logE)
+    g2 = f_E_gtail(logE)
+    f = f_E_fcore(logE)
+    return generate_samples_king2_(N,s1,g1,s2,g2,f)
+
+def psf_scale_factor_(E):
+    """
+    Scale factor for PSF for FRONT events
+
+    Parameters
+    ----------
+    E : float
+        energy (MeV)
+
+    Returns
+    -------
+    float
+        scale factor for PSF
+    """
+    c0 = 6.38e-2
+    c1 = 1.26e-3
+    beta = 0.8
+
+    return np.sqrt((c0 * (E/100)**-beta)**2. + c1**2.)
 
 # ======================================================================
 # ======================================================================
