@@ -5,3 +5,8 @@ Raw code for finding point sources in Fermi-LAT data with wavelets. Will provide
 Read the README.txt file for details.
 
 # Installation
+Run the `environment.yml` file by running the following command on the main repo directory:
+```
+conda env create
+```
+The installation works for `conda==4.14.0`. 
