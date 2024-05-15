@@ -1,5 +1,5 @@
 # skysearch
-Raw code for finding point sources in Fermi-LAT data with wavelets. Will provide a cleaner tutorial version of this code later. 
+Pipeline for finding point sources in Fermi-LAT data with the continuous wavelet transform. For a tutorial that describes how this code works, see the [allsky-point-source-detection][https://github.com/edwarddramirez/allsky-point-source-detection] repo.
 
 # Instructions
 Read the README.txt file for details.
