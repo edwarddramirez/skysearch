@@ -3,6 +3,9 @@ Directory: /het/p4/ramirez/gcewavelets/skysearch
 Author: Edward Ramirez
 Date: 05/02/2023
 
+Note: This code is a pipeline that uses HTCondor to run various jobs in parallel. 
+If you are not using HTCondor, the .py files should still be useful.
+
 ################################################
 ################# General Idea #################
 ################################################
